@@ -9,19 +9,19 @@ Four models of cereal boxes.
 <table>
   <tr>
     <td>can1</td>
-    <td><img src="generation/screenshots/can1.png" alt="can1 screenshot"></td>
+    <td><img src="generation/screenshots/can1.png" alt="can1 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>can2</td>
-    <td><img src="generation/screenshots/can2.png" alt="can2 screenshot"></td>
+    <td><img src="generation/screenshots/can2.png" alt="can2 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>can3</td>
-    <td><img src="generation/screenshots/can3.png" alt="can3 screenshot"></td>
+    <td><img src="generation/screenshots/can3.png" alt="can3 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>can4</td>
-    <td><img src="generation/screenshots/can4.png" alt="can4 screenshot"></td>
+    <td><img src="generation/screenshots/can4.png" alt="can4 screenshot" width="20%"></td>
   </tr>
 </table>
 
@@ -33,19 +33,19 @@ Four models of cans.
 <table>
   <tr>
     <td>cereal1</td>
-    <td><img src="generation/screenshots/cereal1.png" alt="cereal1 screenshot"></td>
+    <td><img src="generation/screenshots/cereal1.png" alt="cereal1 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>cereal2</td>
-    <td><img src="generation/screenshots/cereal2.png" alt="cereal2 screenshot"></td>
+    <td><img src="generation/screenshots/cereal2.png" alt="cereal2 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>cereal3</td>
-    <td><img src="generation/screenshots/cereal3.png" alt="cereal3 screenshot"></td>
+    <td><img src="generation/screenshots/cereal3.png" alt="cereal3 screenshot" width="20%"></td>
   </tr>
   <tr>
     <td>cereal4</td>
-    <td><img src="generation/screenshots/cereal4.png" alt="cereal4 screenshot"></td>
+    <td><img src="generation/screenshots/cereal4.png" alt="cereal4 screenshot" width="20%"></td>
   </tr>
 </table>
 
