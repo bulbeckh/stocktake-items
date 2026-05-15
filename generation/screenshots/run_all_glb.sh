@@ -1,4 +1,5 @@
 #!/bin/bash
-for f in assets/models/*.glb; do
-  blender -b --python render_glb.py -- "$f" "screenshots/$(basename "$f" .glb).png"
+for f in ../../*/meshes/*.glb; do
+  echo $(realpath $f)
+  blender -b --python render_glb.py -- "$(realpath $f)" "$(pwd)/$(basename "$f" .glb).png"
 done
