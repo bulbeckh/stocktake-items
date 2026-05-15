@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Stocktake Models</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #222;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    main {
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding: 32px;
+    }
+
+    #title {
+      margin: 0 0 24px;
+      font-size: 24px;
+    }
+
+    #model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .model-card {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px) minmax(280px, 480px);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .model-description {
+      margin: 0;
+      color: #ddd;
+      line-height: 1.5;
+    }
+
+    .viewer {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      border: 1px solid #555;
+      background: #333;
+    }
+
+    .viewer canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: #ccc;
+      font-size: 14px;
+      z-index: 10;
+    }
+
+    @media (max-width: 760px) {
+      .model-card {
+        grid-template-columns: 1fr;
+      }
+
+      .viewer {
+        height: 360px;
+      }
+    }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+
+<main>
+  <h1 id="title">Stocktake Models</h1>
+  <div id="model-list"></div>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const models = [
+  {
+    glbPath: './cereal1/meshes/cereal1.glb',
+    description: 'cereal1'
+  },
+  {
+    glbPath: './cereal2/meshes/cereal2.glb',
+    description: 'cereal2'
+  },
+  {
+    glbPath: './cereal3/meshes/cereal3.glb',
+    description: 'cereal3'
+  },
+  {
+    glbPath: './cereal4/meshes/cereal4.glb',
+    description: 'cereal4'
+  },
+  {
+    glbPath: './can1/meshes/can1.glb',
+    description: 'can1'
+  },
+  {
+    glbPath: './can2/meshes/can2.glb',
+    description: 'can2'
+  },
+  {
+    glbPath: './can3/meshes/can3.glb',
+    description: 'can3'
+  },
+  {
+    glbPath: './can4/meshes/can4.glb',
+    description: 'can4'
+  },
+];
+
+const modelList = document.getElementById('model-list');
+const loader = new GLTFLoader();
+const rotationPivotOffset = new THREE.Vector3(0, 0.1, 0);
+const viewers = models.map(createModelViewer);
+
+function createModelViewer({ glbPath, description }) {
+  const card = document.createElement('section');
+  card.className = 'model-card';
+
+  const descriptionElement = document.createElement('p');
+  descriptionElement.className = 'model-description';
+  descriptionElement.textContent = description;
+
+  const viewerElement = document.createElement('div');
+  viewerElement.className = 'viewer';
+
+  const status = document.createElement('div');
+  status.className = 'status';
+  status.textContent = 'Loading model...';
+  viewerElement.appendChild(status);
+
+  card.append(descriptionElement, viewerElement);
+  modelList.appendChild(card);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x333333);
+
+  const size = getViewerSize(viewerElement);
+  const camera = new THREE.PerspectiveCamera(60, size.width / size.height, 0.1, 1000);
+  camera.position.set(2, 2, 4);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(size.width, size.height);
+  viewerElement.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.enabled = false;
+  controls.update();
+
+  scene.add(new THREE.AxesHelper(2));
+  scene.add(new THREE.GridHelper(10, 10));
+  scene.add(new THREE.AmbientLight(0xffffff, 2));
+
+  const light = new THREE.DirectionalLight(0xffffff, 3);
+  light.position.set(5, 10, 7);
+  scene.add(light);
+
+  const viewer = {
+    camera,
+    renderer,
+    spinningModel: null,
+    element: viewerElement,
+    scene
+  };
+
+  loader.load(
+    glbPath,
+
+    (gltf) => {
+      const model = gltf.scene;
+
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const modelSize = box.getSize(new THREE.Vector3());
+
+      const pivot = new THREE.Group();
+      pivot.position.copy(rotationPivotOffset);
+      model.position.copy(center).multiplyScalar(-1).sub(rotationPivotOffset);
+      pivot.add(model);
+      scene.add(pivot);
+      viewer.spinningModel = pivot;
+
+      const maxDim = Math.max(modelSize.x, modelSize.y, modelSize.z);
+      camera.position.set(maxDim * 1.5, maxDim * 1.2, maxDim * 1.5);
+      camera.near = maxDim / 100;
+      camera.far = maxDim * 100;
+      camera.updateProjectionMatrix();
+
+      controls.target.set(0, 0, 0);
+      controls.update();
+
+      status.innerText = 'Model loaded';
+      console.log('GLB loaded', gltf);
+    },
+
+    (progress) => {
+      if (progress.total) {
+        const percent = ((progress.loaded / progress.total) * 100).toFixed(0);
+        status.innerText = `Loading model: ${percent}%`;
+      }
+    },
+
+    (error) => {
+      status.innerText = 'Failed to load model';
+      console.error(error);
+    }
+  );
+
+  return viewer;
+}
+
+function getViewerSize(viewerElement) {
+  return {
+    width: viewerElement.clientWidth,
+    height: viewerElement.clientHeight
+  };
+}
+
+window.addEventListener('resize', () => {
+  viewers.forEach((viewer) => {
+    const size = getViewerSize(viewer.element);
+    viewer.camera.aspect = size.width / size.height;
+    viewer.camera.updateProjectionMatrix();
+    viewer.renderer.setSize(size.width, size.height);
+  });
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  viewers.forEach((viewer) => {
+    if (viewer.spinningModel) {
+      viewer.spinningModel.rotation.y += 0.005;
+    }
+
+    viewer.renderer.render(viewer.scene, viewer.camera);
+  });
+}
+
+animate();
+</script>
+
+</body>
+</html>
